@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Callable
 
 DEFAULT_RESPONSE_STYLE = "concise"
+SHORT_TERM_WINDOW = 10
+DEFAULT_MAX_STEPS = 6
 
 
 @dataclass
@@ -26,7 +28,7 @@ class ShortTermMemory:
     def context(self) -> str:
         if not self._events:
             return "No short-term memory yet."
-        return "\n".join(self._events[-10:])
+        return "\n".join(self._events[-SHORT_TERM_WINDOW:])
 
     def clear(self) -> None:
         self._events = []
@@ -93,7 +95,7 @@ class ReActAgent:
                 return line[len(prefix) :].strip()
         return ""
 
-    def run(self, user_input: str, max_steps: int = 6) -> str:
+    def run(self, user_input: str, max_steps: int = DEFAULT_MAX_STEPS) -> str:
         scratchpad = ""
         self.short_memory.add(f"User: {user_input}")
         for _ in range(max_steps):

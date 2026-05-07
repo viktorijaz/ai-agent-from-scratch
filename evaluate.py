@@ -1,9 +1,18 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from agent import LongTermMemory, ReActAgent, ShortTermMemory, Tool
+
+
+def _matches_expected(answer: str, expected_contains: str) -> bool:
+    answer_lower = answer.lower()
+    expected_lower = expected_contains.lower()
+    if " " in expected_lower:
+        return expected_lower in answer_lower
+    return re.search(rf"\b{re.escape(expected_lower)}\b", answer_lower) is not None
 
 
 def evaluate(agent: ReActAgent, eval_path: str) -> dict[str, float]:
@@ -19,7 +28,7 @@ def evaluate(agent: ReActAgent, eval_path: str) -> dict[str, float]:
         for key, value in row.get("memory", {}).items():
             agent.long_memory.set(key, value)
         answer = agent.run(row["input"])
-        if row["expected_contains"].lower() in answer.lower():
+        if _matches_expected(answer, row["expected_contains"]):
             passed += 1
 
     total = len(rows)
