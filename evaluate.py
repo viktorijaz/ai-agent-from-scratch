@@ -41,6 +41,7 @@ def main() -> None:
             name="remember_preference",
             description="Store the user's preferred response style.",
             func=lambda value: f"Stored style {value}",
+            on_use=lambda memory, value: memory.set("preferred_style", value),
         )
     ]
     agent = ReActAgent(

@@ -24,6 +24,7 @@ class ReActAgentTests(unittest.TestCase):
                         name="remember_preference",
                         description="Store user style preference",
                         func=lambda v: f"stored={v}",
+                        on_use=lambda memory, value: memory.set("preferred_style", value),
                     )
                 ],
                 short_memory=ShortTermMemory(),
