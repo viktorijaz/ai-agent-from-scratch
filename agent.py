@@ -11,6 +11,7 @@ class Tool:
     name: str
     description: str
     func: Callable[[str], str]
+    on_use: Callable[["LongTermMemory", str], None] | None = None
 
 
 class ShortTermMemory:
@@ -102,14 +103,13 @@ class ReActAgent:
                 return fallback
 
             observation = tool.func(action_input)
+            if tool.on_use is not None:
+                tool.on_use(self.long_memory, action_input)
             scratchpad += (
                 f"\nLLM Output:\n{output}\n"
                 f"Observation: {observation}\n"
             )
             self.short_memory.add(f"Used {action} with input '{action_input}' -> {observation}")
-
-            if action == "remember_preference":
-                self.long_memory.set("preferred_style", action_input)
 
         fallback = "I reached the maximum number of reasoning steps."
         self.short_memory.add(f"Agent: {fallback}")
