@@ -92,7 +92,7 @@ class ReActAgent:
     def _parse_field(text: str, prefix: str) -> str:
         for line in text.splitlines():
             if line.startswith(prefix):
-                return line[len(prefix) :].strip()
+                return line[len(prefix):].strip()
         return ""
 
     def run(self, user_input: str, max_steps: int = DEFAULT_MAX_STEPS) -> str:
