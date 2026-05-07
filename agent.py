@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
+DEFAULT_RESPONSE_STYLE = "concise"
+
 
 @dataclass
 class Tool:
@@ -26,6 +28,9 @@ class ShortTermMemory:
             return "No short-term memory yet."
         return "\n".join(self._events[-10:])
 
+    def clear(self) -> None:
+        self._events = []
+
 
 class LongTermMemory:
     def __init__(self, path: str = "memory_store.json") -> None:
@@ -41,6 +46,10 @@ class LongTermMemory:
 
     def set(self, key: str, value: str) -> None:
         self._store[key] = value
+        self.path.write_text(json.dumps(self._store, indent=2), encoding="utf-8")
+
+    def clear(self) -> None:
+        self._store = {}
         self.path.write_text(json.dumps(self._store, indent=2), encoding="utf-8")
 
 
@@ -61,7 +70,7 @@ class ReActAgent:
         tool_text = "\n".join(
             f"- {tool.name}: {tool.description}" for tool in self.tools.values()
         )
-        remembered_style = self.long_memory.get("preferred_style", "concise")
+        remembered_style = self.long_memory.get("preferred_style", DEFAULT_RESPONSE_STYLE)
         return (
             "You are a ReAct agent.\n"
             "Use this format:\n"

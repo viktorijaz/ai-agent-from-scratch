@@ -14,6 +14,10 @@ def evaluate(agent: ReActAgent, eval_path: str) -> dict[str, float]:
 
     passed = 0
     for row in rows:
+        agent.short_memory.clear()
+        agent.long_memory.clear()
+        for key, value in row.get("memory", {}).items():
+            agent.long_memory.set(key, value)
         answer = agent.run(row["input"])
         if row["expected_contains"].lower() in answer.lower():
             passed += 1
