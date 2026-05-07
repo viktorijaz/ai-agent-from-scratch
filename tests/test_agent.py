@@ -3,10 +3,14 @@ import unittest
 from pathlib import Path
 
 from agent import LongTermMemory, ReActAgent, ShortTermMemory, Tool
-from evaluate import evaluate
+from evaluate import _matches_expected, evaluate
 
 
 class ReActAgentTests(unittest.TestCase):
+    def test_expected_match_avoids_partial_word_false_positive(self) -> None:
+        self.assertFalse(_matches_expected("This is informal.", "formal"))
+        self.assertTrue(_matches_expected("This is formal.", "formal"))
+
     def test_tool_call_then_final_answer(self) -> None:
         outputs = iter(
             [
